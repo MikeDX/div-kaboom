@@ -67,13 +67,19 @@ begin
 
     y=152+pid*16;
 
-
     loop
         x=mouse.x;
+
         frame;
     end
 
 
 end
 
+
+process bomb()
+
+begin
+
+end
 
