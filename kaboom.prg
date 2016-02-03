@@ -9,9 +9,10 @@ program kaboom;
 
 global
     lives=3;
-    level=1;
+    level=0;
     score=0;
     playing=0;
+    bombs=0;
 
 begin
 
@@ -48,27 +49,60 @@ begin
 
     loop
 
-        if(playing==1)
+        if(playing==1 && bombs>0)
             if(x==targetx)
-                targetx=x+rand(-(5+level),(5+level));
+
+                targetx=rand(30,290);
+                /*
+                repeat
+                    targetx=x+rand(-(5+level*2),(5+level*2));
+
+                until (targetx>30 && targetx<290)
+                */
+
             end
 
             if(x<targetx)
-                x++;
+                x+=level;
+                if(x>targetx)
+                    x=targetx;
+                end
+
             end
 
             if(x>targetx)
-                x--;
+                x-=level;
+                if(x<targetx)
+                    x=targetx;
+                end
             end
 
             if (timer[0]>nextbomb)
                 bomb(x);
-                nextbomb=timer[0]+50;
+                nextbomb=timer[0]+50-level;
+                bombs--;
+
+            end
+
+            if(x<30)
+                x=30;
+                targetx=16;
+            end
+
+            if(x>290)
+                x=290;
+                targetx=x;
             end
 
 
         end
 
+        if(bombs==0)
+            if(!get_id(type bomb))
+                frame(2400);
+                playing=0;
+            end
+        end
 
         frame;
     end
@@ -80,6 +114,7 @@ process player();
 private
 
     pid=0;
+    bombid=0;
 
 begin
 
@@ -101,11 +136,21 @@ begin
         if(playing==0)
             if(mouse.left)
                 playing=1;
+                bombs=(level+1)*5;
+                level++;
+
             end
         end
 
         x=mouse.x;
+        bombid=collision(type bomb);
+        if(bombid)
+            if(bombid.y<y+5)
+                explode(bombid.x,bombid.y);
+                signal(bombid,s_kill);
 
+            end
+        end
         frame;
     end
 
@@ -115,15 +160,36 @@ end
 
 process bomb(x)
 
+private
+
+
 begin
+    graph=12;
 
     y=father.y+8;
 
-    while(y<220)
+    while(y<210)
+
         y++;
         graph=rand(9,12);
+
         frame;
     end
 
 end
 
+process explode(x,y);
+
+begin
+
+graph=12;
+
+while(graph<15);
+    frame(300);
+    graph++;
+end
+
+
+
+
+end
