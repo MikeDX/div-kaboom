@@ -9,10 +9,11 @@ program kaboom;
 
 global
     lives=3;
-    level=0;
+    level=1;
     score=0;
     playing=0;
     bombs=0;
+    missed=0;
 
 begin
 
@@ -29,6 +30,35 @@ begin
     player();
 
     loop
+        if(missed>0)
+            missed-=4;
+           // frame(500);
+            if(missed<=0)
+                lives--;
+                level--;
+                missed=0;
+            end
+
+            frame;
+
+        end
+
+        if(lives==0)
+
+            repeat
+                frame;
+            until(mouse.left);
+
+            score=0;
+            bombs=0;
+            lives=3;
+            level=1;
+            playing=0;
+            x=get_id(type prisoner);
+            x.x=160;
+
+            end
+
         frame;
     end
 
@@ -43,22 +73,23 @@ targetx=160;
 nextbomb=0;
 begin
 
-    graph=2;
+    graph=3;
     x=160;
     y=50;
 
     loop
 
         if(playing==1 && bombs>0)
+            graph=2;
             if(x==targetx)
 
-                targetx=rand(30,290);
-                /*
+            //    targetx=rand(30,290);
+
                 repeat
-                    targetx=x+rand(-(5+level*2),(5+level*2));
+                    targetx=rand(x-(level+20),x+(level+20));
 
                 until (targetx>30 && targetx<290)
-                */
+
 
             end
 
@@ -79,7 +110,7 @@ begin
 
             if (timer[0]>nextbomb)
                 bomb(x);
-                nextbomb=timer[0]+50-level;
+                nextbomb=timer[0]+40-level;
                 bombs--;
 
             end
@@ -99,9 +130,13 @@ begin
 
         if(bombs==0)
             if(!get_id(type bomb))
-                frame(2400);
+                frame(1000);
                 playing=0;
             end
+        end
+
+        if(missed>0)
+            graph=4;
         end
 
         frame;
@@ -134,31 +169,39 @@ begin
 
     loop
         anim++;
+        graph=0;
+        if(pid<=lives)
 
-        if(playing==0)
+        if(playing==0 && pid==0)
             if(mouse.left)
                 playing=1;
                 bombs=(level+1)*5;
                 level++;
-
+                missed=0;
             end
         end
-
-        x=mouse.x;
         graph=5+explode;
 
-        if(explode>0 && anim%3==1)
-            explode--;
-        end
+        if(playing)
+            x=mouse.x;
 
-        bombid=collision(type bomb);
-        if(bombid)
-            if(bombid.y<y+5)
-                explosion(bombid.x,bombid.y);
-                signal(bombid,s_kill);
-                explode=3;
+
+            if(explode>0 && anim%3==1)
+                explode--;
+            end
+
+
+            bombid=collision(type bomb);
+            if(bombid)
+                if(bombid.y<y+5)
+                    explosion(bombid.x,bombid.y);
+                    signal(bombid,s_kill);
+                    explode=3;
+                end
             end
         end
+        end
+
         frame;
     end
 
@@ -174,16 +217,31 @@ private
 begin
     graph=12;
 
-    y=father.y+8;
+    y=father.y+16;
 
-    while(y<210)
+    while(y<200)
+        if(missed==0)
+            y++;
+            y+=(level/10);
+            graph=rand(9,12);
+        else
+            if(y>missed)
+            //bigbro.x<220 || bigbro.graph>12)
+                from graph=13 to 15;
+                    frame(200);
+                end
+                y=220;
+            end
+        end
 
-        y++;
-        graph=rand(9,12);
-
-        frame;
+        frame;//(200-level*5);
     end
 
+    if(missed==0)
+        missed=210;
+        bombs=0;
+        explosion(x,y);
+    end
 end
 
 process explosion(x,y);
