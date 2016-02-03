@@ -115,7 +115,8 @@ private
 
     pid=0;
     bombid=0;
-
+    explode=0;
+    anim=0;
 begin
 
     graph=5;
@@ -132,6 +133,7 @@ begin
     y=152+pid*16;
 
     loop
+        anim++;
 
         if(playing==0)
             if(mouse.left)
@@ -143,12 +145,18 @@ begin
         end
 
         x=mouse.x;
+        graph=5+explode;
+
+        if(explode>0 && anim%3==1)
+            explode--;
+        end
+
         bombid=collision(type bomb);
         if(bombid)
             if(bombid.y<y+5)
-                explode(bombid.x,bombid.y);
+                explosion(bombid.x,bombid.y);
                 signal(bombid,s_kill);
-
+                explode=3;
             end
         end
         frame;
@@ -178,7 +186,7 @@ begin
 
 end
 
-process explode(x,y);
+process explosion(x,y);
 
 begin
 
