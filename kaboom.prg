@@ -170,7 +170,7 @@ begin
     loop
         anim++;
         graph=0;
-        if(pid<=lives)
+        if(lives>pid)
 
         if(playing==0 && pid==0)
             if(mouse.left)
@@ -182,7 +182,7 @@ begin
         end
         graph=5+explode;
 
-        if(playing)
+        if(missed==0)
             x=mouse.x;
 
 
